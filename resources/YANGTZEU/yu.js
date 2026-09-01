@@ -187,13 +187,13 @@
             section = mapSectionToTimeSlotNumber(section);
             if (day < 1 || day > 7 || section < 1 || section > 16) continue;
             let teacher = unquoteJsLiteral(args[1]);
-            // 教师值为 JS 表达式时，尝试解析或置空以触发兜底
-            if (teacher && /\.join\s*\(/.test(teacher)) {
+            // 教师值为 JS 表达式（原始 token 非字符串字面量）时，尝试解析或置空
+            if (teacher && !/^['"]/.test(String(args[1]).trim()) && /join\s*\(/.test(String(args[1]))) {
                 const resolved = resolveTeachersForTaskActivityBlock(text, match.index, teacher);
                 teacher = resolved || "";
             }
             const name = cleanCourseName(unquoteJsLiteral(args[3]));
-            let position = unquoteJsLiteral(args[5]);
+            const position = unquoteJsLiteral(args[5]);
             const weekBitmap = unquoteJsLiteral(args[6]);
             const weeks = normalizeWeeks(parseValidWeeksBitmap(weekBitmap));
             if (!name) continue;
